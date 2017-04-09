@@ -72,5 +72,24 @@ def get_college(college_name):
         results[year_table] = cur.fetchone()
     return jsonify(results)
 
+@app.route('/cscvis/api/v1.0/colleges/<path:college_name>/<string:year>', methods=['GET'])
+def get_college_year(college_name, year):
+    """GET method for a college in a specific year.
+
+    Args:
+        college_name: College name that matches Scorecard's INSTNM property.
+        year: Valid year of Scorecard data.
+
+    Returns:
+        data: JSON list of data for the year.
+    """
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        '''select * from "%s" inner join College on
+        College.college_id = "%s".college_id where instnm = ?'''
+        % (year, year), (college_name,))
+    return jsonify(cur.fetchall()[0])
+
 if __name__ == '__main__':
     app.run(debug=True)
