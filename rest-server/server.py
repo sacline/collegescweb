@@ -32,6 +32,25 @@ def init_server():
     COLLEGE_NAMES = _get_college_names()
     COLUMN_NAMES = _get_column_names()
 
+def valid_inputs(college=None, table=None, column=None):
+    """Validate any inputs to the API passed through the URI.
+
+    Args:
+        college: Name of the college passed through the URI.
+        table: Name of the table passed through the URI.
+        column: Name of the data_type passed through the URI.
+
+    Returns:
+        boolean: True if inputs match the database, false if they do not.
+    """
+    if college is not None and college not in COLLEGE_NAMES:
+        return False
+    if table is not None and table not in TABLE_NAMES:
+        return False
+    if column is not None and column not in COLUMN_NAMES:
+        return False 
+    return True
+
 @app.route('/cscvis/api/v1.0/colleges', methods=['GET'])
 def get_colleges():
     """GET method for all colleges.
@@ -60,7 +79,7 @@ def get_college(college_name):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if college_name not in COLLEGE_NAMES:
+    if not valid_inputs(college=college_name):
         abort(404)
     try:
         cur.execute(
@@ -90,9 +109,7 @@ def get_college_year(college_name, year):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if college_name not in COLLEGE_NAMES:
-        abort(404)
-    if year not in TABLE_NAMES:
+    if not valid_inputs(college=college_name, table=year):
         abort(404)
     cur.execute(
         '''select * from "%s" inner join College on
@@ -115,11 +132,7 @@ def get_data_type(college_name, year, data_type):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if college_name not in COLLEGE_NAMES:
-        abort(404)
-    if year not in TABLE_NAMES:
-        abort(404)
-    if data_type not in COLUMN_NAMES:
+    if not valid_inputs(college=college_name, table=year, column=data_type):
         abort(404)
     cur.execute('''select %s from "%s" inner join College on
                 College.college_id = "%s".college_id where instnm = ?'''
