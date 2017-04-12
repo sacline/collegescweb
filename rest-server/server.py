@@ -21,16 +21,16 @@ from flask import Flask, abort, jsonify
 
 DB_PATH = os.getcwd() + '/data/database/college-scorecard.sqlite'
 
-table_names, college_names, column_names = [], [], []
+TABLE_NAMES, COLLEGE_NAMES, COLUMN_NAMES = (), (), ()
 
 app = Flask(__name__)
 
 def init_server():
     """Call functions to get and store database info for input validation."""
-    global table_names, college_names, column_names
-    table_names = _get_table_names()
-    college_names = _get_college_names()
-    column_names = _get_column_names()
+    global TABLE_NAMES, COLLEGE_NAMES, COLUMN_NAMES
+    TABLE_NAMES = _get_table_names()
+    COLLEGE_NAMES = _get_college_names()
+    COLUMN_NAMES = _get_column_names()
 
 @app.route('/cscvis/api/v1.0/colleges', methods=['GET'])
 def get_colleges():
@@ -60,7 +60,7 @@ def get_college(college_name):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if college_name not in college_names:
+    if college_name not in COLLEGE_NAMES:
         abort(404)
     try:
         cur.execute(
@@ -70,7 +70,7 @@ def get_college(college_name):
         abort(404)
 
     results = {}
-    for year_table in table_names:
+    for year_table in TABLE_NAMES:
         cur.execute(
             'select * from "%s" where college_id = ?' %
                 (year_table,), (college_id,))
@@ -90,9 +90,9 @@ def get_college_year(college_name, year):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if college_name not in college_names:
+    if college_name not in COLLEGE_NAMES:
         abort(404)
-    if year not in table_names:
+    if year not in TABLE_NAMES:
         abort(404)
     cur.execute(
         '''select * from "%s" inner join College on
@@ -115,11 +115,11 @@ def get_data_type(college_name, year, data_type):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if college_name not in college_names:
+    if college_name not in COLLEGE_NAMES:
         abort(404)
-    if year not in table_names:
+    if year not in TABLE_NAMES:
         abort(404)
-    if data_type not in column_names:
+    if data_type not in COLUMN_NAMES:
         abort(404)
     cur.execute('''select %s from "%s" inner join College on
                 College.college_id = "%s".college_id where instnm = ?'''
@@ -133,11 +133,11 @@ def _get_table_names():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute('select name from sqlite_master where type = "table"')
-    table_names = []
+    tables = []
     for tup in cur.fetchall():
         if tup[0] not in 'sqlite_sequence':
-            table_names.append(tup[0])
-    return table_names
+            tables.append(tup[0])
+    return tuple(tables)
 
 def _get_college_names():
     """Retrieve college names from the database and store for input validation.
@@ -145,23 +145,23 @@ def _get_college_names():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute('select instnm from College')
-    college_names = []
+    colleges = []
     for tup in cur.fetchall():
-        college_names.append(tup[0])
-    return college_names
+        colleges.append(tup[0])
+    return tuple(colleges)
 
 def _get_column_names():
     """Retrieve column names from the database and store for input validation.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    column_names = []
-    for table in table_names:
+    columns = []
+    for table in TABLE_NAMES:
         cur.execute('PRAGMA table_info("%s")' % (table))
         for value in cur.fetchall():
-            if value[1] not in column_names:
-                column_names.append(value[1])
-    return column_names
+            if value[1] not in columns:
+                columns.append(value[1])
+    return tuple(columns)
 
 if __name__ == '__main__':
     init_server()
