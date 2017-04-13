@@ -75,8 +75,8 @@ def get_college(college_name):
         college_name: College name that matches Scorecard's INSTNM property.
 
     Returns:
-        results: JSON dictionary of all data for the college formatted as:
-            {"year" : [value0, value1, value2...]}
+        results: JSON object containing objects of all data for the college
+            formatted as: {"year" : {data_type1: value1, data_type2: value2...}}
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -94,7 +94,10 @@ def get_college(college_name):
         cur.execute(
             'select * from "%s" where college_id = ?' %
                 (year_table,), (college_id,))
-        results[year_table] = cur.fetchone()
+        inner_dict = {}
+        for data_type, result in zip(DATA_TYPE_NAMES, cur.fetchone()):
+            inner_dict[data_type] = result
+        results[year_table] = inner_dict
     conn.close()
     return jsonify(results)
 
@@ -107,7 +110,7 @@ def get_college_year(college_name, year):
         year: Valid year of Scorecard data.
 
     Returns:
-        data: JSON list of data for the year.
+        data: JSON object of college data for the year.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -117,7 +120,9 @@ def get_college_year(college_name, year):
         '''select * from "%s" inner join College on
         College.college_id = "%s".college_id where instnm = ?'''
         % (year, year), (college_name,))
-    data = cur.fetchall()[0]
+    data = {}
+    for data_type, result in zip(DATA_TYPE_NAMES, cur.fetchone()):
+        data[data_type] = result
     conn.close()
     return jsonify(data)
 
@@ -131,7 +136,7 @@ def get_data_type(college_name, year, data_type):
         data_type: Data to return that matches the Scorecard property.
 
     Returns:
-        data: JSON data for college_name's data_type in year.
+        data: JSON array of data for the college's data_type in given year.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
