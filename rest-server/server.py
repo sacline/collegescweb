@@ -21,33 +21,33 @@ from flask import Flask, abort, jsonify
 
 DB_PATH = os.getcwd() + '/data/database/college-scorecard.sqlite'
 
-TABLE_NAMES, COLLEGE_NAMES, COLUMN_NAMES = (), (), ()
+YEAR_NAMES, COLLEGE_NAMES, DATA_TYPE_NAMES = (), (), ()
 
 app = Flask(__name__)
 
 def init_server():
     """Call functions to get and store database info for input validation."""
-    global TABLE_NAMES, COLLEGE_NAMES, COLUMN_NAMES
-    TABLE_NAMES = _get_table_names()
+    global YEAR_NAMES, COLLEGE_NAMES, DATA_TYPE_NAMES
+    YEAR_NAMES = _get_year_names()
     COLLEGE_NAMES = _get_college_names()
-    COLUMN_NAMES = _get_column_names()
+    DATA_TYPE_NAMES = _get_data_type_names()
 
-def valid_inputs(college=None, table=None, column=None):
+def valid_inputs(college=None, year=None, data_type=None):
     """Validate any inputs to the API passed through the URI.
 
     Args:
         college: Name of the college passed through the URI.
-        table: Name of the table passed through the URI.
-        column: Name of the data_type passed through the URI.
+        year: Name of the year passed through the URI.
+        data_type: Name of the data_type passed through the URI.
 
     Returns:
         boolean: True if inputs match the database, false if they do not.
     """
     if college is not None and college not in COLLEGE_NAMES:
         return False
-    if table is not None and table not in TABLE_NAMES:
+    if year is not None and year not in YEAR_NAMES:
         return False
-    if column is not None and column not in COLUMN_NAMES:
+    if data_type is not None and data_type not in DATA_TYPE_NAMES:
         return False
     return True
 
@@ -75,7 +75,7 @@ def get_college(college_name):
 
     Returns:
         results: JSON dictionary of all data for the college formatted as:
-            {"Table" : [value0, value1, value2...]}
+            {"year" : [value0, value1, value2...]}
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -89,7 +89,7 @@ def get_college(college_name):
         abort(404)
 
     results = {}
-    for year_table in TABLE_NAMES:
+    for year_table in YEAR_NAMES:
         cur.execute(
             'select * from "%s" where college_id = ?' %
                 (year_table,), (college_id,))
@@ -109,7 +109,7 @@ def get_college_year(college_name, year):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if not valid_inputs(college=college_name, table=year):
+    if not valid_inputs(college=college_name, year=year):
         abort(404)
     cur.execute(
         '''select * from "%s" inner join College on
@@ -132,7 +132,7 @@ def get_data_type(college_name, year, data_type):
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if not valid_inputs(college=college_name, table=year, column=data_type):
+    if not valid_inputs(college=college_name, year=year, data_type=data_type):
         abort(404)
     cur.execute('''select %s from "%s" inner join College on
                 College.college_id = "%s".college_id where instnm = ?'''
@@ -140,20 +140,20 @@ def get_data_type(college_name, year, data_type):
     data = cur.fetchall()[0]
     return jsonify(data)
 
-def _get_table_names():
-    """Retrieve table names from the database and store for input validation.
+def _get_year_names():
+    """Retrieve year table names and store for input validation.
 
     Returns:
-        tables: Tuple of string table names from the database.
+        years: Tuple of string year table names from the database.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute('select name from sqlite_master where type = "table"')
-    tables = []
+    years = []
     for tup in cur.fetchall():
-        if tup[0] not in 'sqlite_sequence':
-            tables.append(tup[0])
-    return tuple(tables)
+        if tup[0] not in ['sqlite_sequence', 'College']:
+            years.append(tup[0])
+    return tuple(years)
 
 def _get_college_names():
     """Retrieve college names from the database and store for input validation.
@@ -169,21 +169,21 @@ def _get_college_names():
         colleges.append(tup[0])
     return tuple(colleges)
 
-def _get_column_names():
-    """Retrieve column names from the database and store for input validation.
+def _get_data_type_names():
+    """Retrieve data_types from the database and store for input validation.
 
     Returns:
-        columns: Tuple of string column names from the database.
+        data_types: Tuple of string data_type names from the database.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    columns = []
-    for table in TABLE_NAMES:
-        cur.execute('PRAGMA table_info("%s")' % (table))
+    data_types = []
+    for year in YEAR_NAMES:
+        cur.execute('PRAGMA table_info("%s")' % (year))
         for value in cur.fetchall():
-            if value[1] not in columns:
-                columns.append(value[1])
-    return tuple(columns)
+            if value[1] not in data_types:
+                data_types.append(value[1])
+    return tuple(data_types)
 
 if __name__ == '__main__':
     init_server()
