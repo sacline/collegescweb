@@ -48,7 +48,7 @@ def valid_inputs(college=None, table=None, column=None):
     if table is not None and table not in TABLE_NAMES:
         return False
     if column is not None and column not in COLUMN_NAMES:
-        return False 
+        return False
     return True
 
 @app.route('/cscvis/api/v1.0/colleges', methods=['GET'])
@@ -142,6 +142,9 @@ def get_data_type(college_name, year, data_type):
 
 def _get_table_names():
     """Retrieve table names from the database and store for input validation.
+
+    Returns:
+        tables: Tuple of string table names from the database.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -154,6 +157,9 @@ def _get_table_names():
 
 def _get_college_names():
     """Retrieve college names from the database and store for input validation.
+
+    Returns:
+        colleges: Tuple of string college names from the database.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -165,6 +171,9 @@ def _get_college_names():
 
 def _get_column_names():
     """Retrieve column names from the database and store for input validation.
+
+    Returns:
+        columns: Tuple of string column names from the database.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
