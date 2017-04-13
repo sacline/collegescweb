@@ -64,6 +64,7 @@ def get_colleges():
     colleges = cur.fetchall()
     for index in range(len(colleges)):
         colleges[index] = colleges[index][0]
+    conn.close()
     return jsonify(colleges)
 
 @app.route('/cscvis/api/v1.0/colleges/<path:college_name>', methods=['GET'])
@@ -94,6 +95,7 @@ def get_college(college_name):
             'select * from "%s" where college_id = ?' %
                 (year_table,), (college_id,))
         results[year_table] = cur.fetchone()
+    conn.close()
     return jsonify(results)
 
 @app.route('/cscvis/api/v1.0/colleges/<path:college_name>/<string:year>', methods=['GET'])
@@ -116,6 +118,7 @@ def get_college_year(college_name, year):
         College.college_id = "%s".college_id where instnm = ?'''
         % (year, year), (college_name,))
     data = cur.fetchall()[0]
+    conn.close()
     return jsonify(data)
 
 @app.route('/cscvis/api/v1.0/colleges/<path:college_name>/<string:year>/<string:data_type>', methods=['GET'])
@@ -138,6 +141,7 @@ def get_data_type(college_name, year, data_type):
                 College.college_id = "%s".college_id where instnm = ?'''
                 % (data_type, year, year), (college_name,))
     data = cur.fetchall()[0]
+    conn.close()
     return jsonify(data)
 
 def _get_year_names():
@@ -153,6 +157,7 @@ def _get_year_names():
     for tup in cur.fetchall():
         if tup[0] not in ['sqlite_sequence', 'College']:
             years.append(tup[0])
+    conn.close()
     return tuple(years)
 
 def _get_college_names():
@@ -167,6 +172,7 @@ def _get_college_names():
     colleges = []
     for tup in cur.fetchall():
         colleges.append(tup[0])
+    conn.close()
     return tuple(colleges)
 
 def _get_data_type_names():
@@ -183,6 +189,7 @@ def _get_data_type_names():
         for value in cur.fetchall():
             if value[1] not in data_types:
                 data_types.append(value[1])
+    conn.close()
     return tuple(data_types)
 
 if __name__ == '__main__':
