@@ -197,4 +197,4 @@ def _get_data_type_names():
 
 if __name__ == '__main__':
     init_server()
-    app.run(debug=True)
+    app.run(debug=False)
