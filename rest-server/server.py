@@ -90,6 +90,8 @@ def get_college(college_name):
             "%s".college_id = College.college_id''' % (year_table, year_table))
         inner_dict = {}
         for data_type, result in zip(DATA_TYPE_NAMES, cur.fetchone()):
+            if result is None:
+                continue
             inner_dict[data_type] = result
         results[year_table] = inner_dict
     conn.close()
@@ -116,6 +118,8 @@ def get_college_year(college_name, year):
         % (year, year), (college_name,))
     data = {}
     for data_type, result in zip(DATA_TYPE_NAMES, cur.fetchone()):
+        if result is None:
+            continue
         data[data_type] = result
     conn.close()
     return jsonify(data)
