@@ -82,18 +82,12 @@ def get_college(college_name):
     cur = conn.cursor()
     if not valid_inputs(college=college_name):
         abort(404)
-    try:
-        cur.execute(
-            'select college_id from College where INSTNM=?', (college_name,))
-        college_id = str(cur.fetchone()[0])
-    except:
-        abort(404)
 
     results = {}
     for year_table in YEAR_NAMES:
         cur.execute(
-            'select * from "%s" where college_id = ?' %
-                (year_table,), (college_id,))
+            '''select * from "%s" inner join College on
+            "%s".college_id = College.college_id''' % (year_table, year_table))
         inner_dict = {}
         for data_type, result in zip(DATA_TYPE_NAMES, cur.fetchone()):
             inner_dict[data_type] = result
