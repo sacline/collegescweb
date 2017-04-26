@@ -21,22 +21,24 @@ from flask import Flask, abort, jsonify
 
 DB_PATH = os.getcwd() + '/data/database/college-scorecard.sqlite'
 
-YEAR_NAMES, COLLEGE_NAMES, DATA_TYPE_NAMES = (), (), ()
+COLLEGE_NAMES, COLLEGE_IDS, YEAR_NAMES, DATA_TYPE_NAMES = (), (), (), ()
 
 app = Flask(__name__)
 
 def init_server():
     """Call functions to get and store database info for input validation."""
-    global YEAR_NAMES, COLLEGE_NAMES, DATA_TYPE_NAMES
+    global YEAR_NAMES, COLLEGE_NAMES, COLLEGE_IDS, DATA_TYPE_NAMES
     YEAR_NAMES = _get_year_names()
     COLLEGE_NAMES = _get_college_names()
+    COLLEGE_IDS = _get_college_ids()
     DATA_TYPE_NAMES = _get_data_type_names()
 
-def valid_inputs(college=None, year=None, data_type=None):
+def valid_inputs(college=None, college_id=None, year=None, data_type=None):
     """Validate any inputs to the API passed through the URI.
 
     Args:
         college: Name of the college passed through the URI.
+        college_id: College id passed through the URI.
         year: Name of the year passed through the URI.
         data_type: Name of the data_type passed through the URI.
 
@@ -45,107 +47,193 @@ def valid_inputs(college=None, year=None, data_type=None):
     """
     if college is not None and college not in COLLEGE_NAMES:
         return False
+    if college_id is not None and college_id not in COLLEGE_IDS:
+        return False
     if year is not None and year not in YEAR_NAMES:
         return False
     if data_type is not None and data_type not in DATA_TYPE_NAMES:
         return False
     return True
 
-@app.route('/cscvis/api/v1.0/colleges', methods=['GET'])
-def get_colleges():
+@app.route('/cscvis/api/v2.0/data/colleges', methods=['GET'])
+def get_all_colleges():
     """GET method for all colleges.
 
     Returns:
-        colleges: JSON list of college names sorted alphabetically.
+        colleges: JSON array of objects containing college ids and their names.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    cur.execute('select instnm from College order by instnm')
-    colleges = cur.fetchall()
-    for index in range(len(colleges)):
-        colleges[index] = colleges[index][0]
+    cur.execute('select college_id, instnm from College order by instnm')
+    colleges = []
+    for result in cur.fetchall():
+        colleges.append({'id':result[0], 'name':result[1]})
     conn.close()
-    return jsonify(colleges)
+    return jsonify({'college':colleges})
 
-@app.route('/cscvis/api/v1.0/colleges/<path:college_name>', methods=['GET'])
-def get_college(college_name):
-    """GET method for specific college. Returns data across all years.
+@app.route('/cscvis/api/v2.0/data/colleges/<int:college_id>', methods=['GET'])
+def get_college(college_id):
+    """GET method for specific college. Returns all global and year data.
 
     Args:
-        college_name: College name that matches Scorecard's INSTNM property.
+        college_id: College id.
 
     Returns:
-        results: JSON object containing objects of all data for the college
-            formatted as: {"year" : {data_type1: value1, data_type2: value2...}}
+        data: JSON object containing objects representing year and global data
+            for the college.
     """
+    min_year = min(int(year) for year in YEAR_NAMES)
+    max_year = max(int(year) for year in YEAR_NAMES)
+    year_data = get_college_years(college_id, str(min_year), str(max_year), json=False)
+    global_data = get_college_global(college_id, json=False)
+    data = year_data.copy()
+    data.update(global_data)
+    return jsonify(data)
+
+@app.route('/cscvis/api/v2.0/data/colleges/<int:college_id>/global', methods=['GET'])
+def get_college_global(college_id, json=True):
+    """GET method for global (non-year-specific) college data.
+
+    Args:
+        college_id: College id.
+
+    Returns:
+        global_data: JSON object containing the global college data.
+    """
+    if not valid_inputs(college_id=college_id):
+        abort(404)
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if not valid_inputs(college=college_name):
-        abort(404)
 
-    results = {}
-    for year_table in YEAR_NAMES:
-        cur.execute(
-            '''select * from "%s" inner join College on
-            "%s".college_id = College.college_id''' % (year_table, year_table))
-        inner_dict = {}
-        for data_type, result in zip(DATA_TYPE_NAMES, cur.fetchone()):
-            if result is None:
-                continue
-            inner_dict[data_type] = result
-        results[year_table] = inner_dict
+    cur.execute('PRAGMA table_info(%s)' % ('College'))
+    college_global_data_types = cur.fetchall()
+
+    cur.execute('''select * from College where college_id = ?''', (college_id,))
+    global_data = {}
+    for data_type, value in zip(college_global_data_types, cur.fetchone()):
+        if value is None:
+            continue
+        global_data[data_type[1]] = value
     conn.close()
-    return jsonify(results)
+    if json is False:
+        return {'global':global_data}
+    return jsonify({'global':global_data})
 
-@app.route('/cscvis/api/v1.0/colleges/<path:college_name>/<string:year>', methods=['GET'])
-def get_college_year(college_name, year):
+@app.route('/cscvis/api/v2.0/data/colleges/<int:college_id>/year/<string:min_year>', methods=['GET'])
+@app.route('/cscvis/api/v2.0/data/colleges/<int:college_id>/year&min=<string:min_year>&max=<string:max_year>', methods=['GET'])
+def get_college_years(college_id, min_year, max_year=None, json=True):
     """GET method for a college in a specific year.
 
+    A single year or range of years may be specified.
+
     Args:
-        college_name: College name that matches Scorecard's INSTNM property.
-        year: Valid year of Scorecard data.
+        college_id: College id.
+        min_year: First year of Scorecard data to return.
+        max_year: Last year of Scorecard data to return.
 
     Returns:
-        data: JSON object of college data for the year.
+        all_data: JSON object containing objects of college data over the year
+            range.
     """
+    if max_year is None:
+        max_year = min_year
+    if int(min_year) > int(max_year):
+        abort(404)
+    if not valid_inputs(college_id=college_id, year=min_year):
+        abort(404)
+    if not valid_inputs(year=max_year):
+        abort(404)
+
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if not valid_inputs(college=college_name, year=year):
-        abort(404)
-    cur.execute(
-        '''select * from "%s" inner join College on
-        College.college_id = "%s".college_id where instnm = ?'''
-        % (year, year), (college_name,))
-    data = {}
-    for data_type, result in zip(DATA_TYPE_NAMES, cur.fetchone()):
-        if result is None:
+
+    all_data = {}
+    for year in range(int(min_year), int(max_year)+1):
+        cur.execute(
+            '''select * from "%s" where college_id = ?'''
+            % (year), (college_id,))
+        year_data = {}
+        query_result = cur.fetchone()
+        if query_result is None:
             continue
-        data[data_type] = result
+        for data_type, result in zip(DATA_TYPE_NAMES, query_result):
+            if result is None:
+                continue
+            year_data[data_type] = result
+        all_data[str(year)] = year_data
+
     conn.close()
-    return jsonify(data)
 
-@app.route('/cscvis/api/v1.0/colleges/<path:college_name>/<string:year>/<string:data_type>', methods=['GET'])
-def get_data_type(college_name, year, data_type):
-    """GET method for a single data type for a college in a given year.
+    if json is False:
+        return all_data
+    else:
+        return jsonify(all_data)
 
-    Args:
-        college_name: College name that matches Scorecard's INSTNM property.
-        year: Valid year of Scorecard data.
-        data_type: Data to return that matches the Scorecard property.
+@app.route('/cscvis/api/v2.0/data/data_types', methods=['GET'])
+def get_data_types():
+    """GET method for all data types.
 
     Returns:
-        data: JSON array of data for the college's data_type in given year.
+        data_types: JSON object containing an array of objects containing the
+            data types name, their type, and scope.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    if not valid_inputs(college=college_name, year=year, data_type=data_type):
+
+    year = min(year for year in YEAR_NAMES)
+    cur.execute('PRAGMA table_info("%s")' % (year))
+    year_data_types = cur.fetchall()
+    cur.execute('PRAGMA table_info(College)')
+    global_data_types = cur.fetchall()
+    data_types = []
+    for result in year_data_types:
+        data_types.append({'name':result[1], 'type':result[2], 'scope':'year'})
+    for result in global_data_types:
+        data_types.append(
+            {'name':result[1], 'type':result[2], 'scope':'global'})
+    return jsonify({'data_type':data_types})
+
+@app.route('/cscvis/api/v2.0/data/data_types/<path:data_type>/year&min=<string:min_year>&max=<string:max_year>', methods=['GET'])
+@app.route('/cscvis/api/v2.0/data/data_types/<path:data_type>/year/<string:min_year>', methods=['GET'])
+def get_data_type_year(data_type, min_year, max_year=None):
+    """GET method for values of a data type over a year or range of years.
+
+    Args:
+        data_type: Data type for which values will be returned.
+        min_year: First year of Scorecard data to return.
+        max_year: Last year of Scorecard data to return.
+
+    Returns:
+        values: JSON object containing arrays of objects for each year, with
+            each object containing the college_id and data value.
+    """
+    if max_year is None:
+        max_year = min_year
+    if int(min_year) > int(max_year):
         abort(404)
-    cur.execute('''select %s from "%s" inner join College on
-                College.college_id = "%s".college_id where instnm = ?'''
-                % (data_type, year, year), (college_name,))
-    data = cur.fetchall()[0]
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    if not valid_inputs(year=min_year, data_type=data_type):
+        abort(404)
+    if not valid_inputs(year=max_year):
+        abort(404)
+
+    all_data = {}
+    for year in range(int(min_year), int(max_year)+1):
+        cur.execute(
+            '''select %s, college_id from "%s" where %s is not null'''
+            % (data_type, year, data_type))
+        query_result = cur.fetchall()
+        if query_result is None:
+            continue
+        year_data = []
+        for college_value in query_result:
+            year_data.append({'college_id':college_value[1], 'value':college_value[0]})
+        all_data[str(year)] = year_data
     conn.close()
-    return jsonify(data)
+    return jsonify(all_data)
 
 def _get_year_names():
     """Retrieve year table names and store for input validation.
@@ -178,6 +266,21 @@ def _get_college_names():
     conn.close()
     return tuple(colleges)
 
+def _get_college_ids():
+    """Retrieve college ids from the database and store for input validation.
+
+    Returns:
+        college_ids: Tuple of string college ids from the database.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute('select college_id from College')
+    college_ids = []
+    for tup in cur.fetchall():
+        college_ids.append(tup[0])
+    conn.close()
+    return tuple(college_ids)
+
 def _get_data_type_names():
     """Retrieve data_types from the database and store for input validation.
 
@@ -197,4 +300,4 @@ def _get_data_type_names():
 
 if __name__ == '__main__':
     init_server()
-    app.run(debug=False)
+    app.run(debug=True)
