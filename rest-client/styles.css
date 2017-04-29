@@ -1,9 +1,17 @@
 body {
-  background-color:#AAAAAA
+  background-color:#AAAAAA;
 }
 
 .jumbotron {
-  padding-top: 30px;
+  padding-top:30px;
   background-color:#000000 !important;
   color:#FFFFFF;
+}
+
+.toprow {
+  margin-top:30px;
+}
+
+.criteriarow {
+  margin-top:50px;
 }
