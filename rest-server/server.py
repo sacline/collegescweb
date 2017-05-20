@@ -235,6 +235,37 @@ def get_data_type_year(data_type, min_year, max_year=None):
     conn.close()
     return jsonify(all_data)
 
+@app.route('/cscvis/api/v2.0/data/data_types/<path:data_type>/global', methods=['GET'])
+def get_data_type_global(data_type):
+    """GET method for values of a global data type.
+
+    Args:
+        data_type: Global data type for which values will be returned.
+
+    Returns:
+        values: JSON object containing objects with the college_id and data
+            value.
+    """
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    if not valid_inputs(data_type=data_type):
+        print(data_type, 'invalid')
+        abort(404)
+
+    all_data = {}
+    cur.execute(
+        '''select %s, college_id from College where %s is not null'''
+        % (data_type, data_type))
+    query_result = cur.fetchall()
+    global_data = []
+    for college_value in query_result:
+        global_data.append({'college_id':college_value[1], 'value':college_value[0]})
+    conn.close()
+    print(all_data)
+    return jsonify({'Global':global_data})
+
 def _get_year_names():
     """Retrieve year table names and store for input validation.
 
@@ -290,12 +321,21 @@ def _get_data_type_names():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     data_types = []
+
+    cur.execute('PRAGMA table_info(College)')
+    for value in cur.fetchall():
+        if value[1] not in data_types:
+            data_types.append(value[1])
+
     for year in YEAR_NAMES:
         cur.execute('PRAGMA table_info("%s")' % (year))
         for value in cur.fetchall():
             if value[1] not in data_types:
                 data_types.append(value[1])
+        break;
+
     conn.close()
+    print(data_types)
     return tuple(data_types)
 
 if __name__ == '__main__':
