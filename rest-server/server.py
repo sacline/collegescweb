@@ -67,7 +67,7 @@ def get_all_colleges():
     cur.execute('select college_id, instnm from College order by instnm')
     colleges = []
     for result in cur.fetchall():
-        colleges.append({'id':result[0], 'name':result[1]})
+        colleges.append({'college_id':result[0], 'name':result[1]})
     conn.close()
     return jsonify({'college':colleges})
 
