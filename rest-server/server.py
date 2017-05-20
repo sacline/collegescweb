@@ -264,7 +264,7 @@ def get_data_type_global(data_type):
         global_data.append({'college_id':college_value[1], 'value':college_value[0]})
     conn.close()
     print(all_data)
-    return jsonify({'Global':global_data})
+    return jsonify({'global':global_data})
 
 def _get_year_names():
     """Retrieve year table names and store for input validation.
