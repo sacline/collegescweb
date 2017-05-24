@@ -22,59 +22,89 @@
       </div>
     </div>
 
-    <div class="container-fluid">
-      <div class="row toprow">
 
-        <div class="col-sm-2 col-sm-offset-2">
-          <select ng-controller="CategoryListController" class="form-control">
-            <option ng-repeat="dt in dts"><p>{{dt.name}}</p></option>
-          </select>
+    <div class="container-fluid" ng-controller="ViewController">
+      <form name="criteriaForm" ng-controller="CriteriaFormController" ng-show="visibility.form" ng-submit="submitForm()">
+        <div ng-repeat-start="criteria in criteriaList" class="row toprow">
+
+          <div class="col-md-2 col-md-offset-2">
+            <select ng-model="criteria.selectedCategory" ng-change="setRowCategoryInfo(criteria.index, criteria.selectedCategory)" class="form-control">
+              <option ng-repeat="category in categories.data" value="{{category.name}}">{{category.name}}</option>
+            </select>
+          </div>
+
+          <div class="col-md-2">
+           <select ng-model="criteria.selectedComparison" class="form-control">
+             <option ng-repeat="comparison in criteria.allowableComparisons">{{comparison}}</option>
+           </select>
+          </div>
+
+          <div class="col-md-4">
+            <div ng-switch on="criteria.selectedCategoryType">
+              <input class="form-control" placeholder="Enter a whole number greater than 0" type="number" min="0" max="999999999" ng-model="criteria.inputValue" ng-switch-when="INTEGER">
+              <input class="form-control" placeholder="Enter a decimal number between 0 and 1" type="number" min="0" max="1" step="0.001" ng-model="criteria.inputValue" ng-switch-when="REAL">
+              <input class="form-control" placeholder="Enter some text" type="text" ng-model="criteria.inputValue" ng-switch-when="TEXT">
+            </div>
+          </div>
+
+          <div class="col-md-1">
+            <button type="button" class="btn btn-default" ng-click="removeRow(criteria.index)">
+            X
+            </button>
+          </div>
         </div>
+        <div ng-repeat-end></div>
 
-        <div class="col-sm-2">
-          <select class="form-control">
-            <option>Equal to</option>
-            <option>Greater than</option>
-            <option>Less than</option>
-          </select>
+        <div class="row" style="margin-top:100px">
+          <div class="col-md-2 col-md-offset-4">
+            <button type="button" class="btn btn-default" ng-click="addRow()">
+              Add Criteria
+            </button>
+          </div>
+
+          <div class="col-md-2">
+            <input type="submit" class="btn btn-default" value="Search"/>
+          </div>
         </div>
+      </form>
 
-        <div class="col-sm-2">
-          <div class="input-group">
-          <input type="text" placeholder="Value">
+      <div ng-show="visibility.results" ng-controller="ResultViewController">
+        <div class="row">
+          <div class="col-md-2 col-md-offset-5">
+          <h1>Results</h1>
           </div>
         </div>
 
-        <div class="col-sm-1 col-sm-offset-2">
-          <button type="button" class="btn btn-default">
-          X
+        <div class="row">
+          <div class="col-md-6 col-md-offset-1">
+            <b>Name - City, State</b>
+          </div>
+          <div ng-repeat="criteria in criteriaList" class="col-md-1">
+            <b>{{criteria.selectedCategory}}</b>
+          </div>
+        </div>
+
+        <div class="row" ng-repeat="thing in results.data">
+          <div class="col-md-6 col-md-offset-1">
+            {{locationData[thing.id].name}} - {{locationData[thing.id].city}}, {{locationData[thing.id].state}}
+          </div>
+          <div ng-repeat="criteria in criteriaList" class="col-md-1">
+            {{thing[criteria.selectedCategory]}}
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="col-md-2 col-md-offset-5" class="btn btn-default" type="button" style="margin-bottom:50px" ng-click="returnToSearch()">
+            Back to Search
           </button>
         </div>
       </div>
-
-      <div class="row" style="margin-top:100px">
-
-        <div class="col-sm-2 col-sm-offset-4">
-          <button type="button" class="btn btn-default">
-          Add Criteria
-          </button>
-        </div>
-
-        <div class="col-sm-2">
-          <button type="button" class="btn btn-default">
-          Search
-          </button>
-        </div>
-
-      </div>
-
     </div>
 
   </body>
 
   <!--Scripts-->
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-resource.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="cscexplorer.js"></script>
