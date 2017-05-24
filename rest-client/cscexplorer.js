@@ -20,6 +20,34 @@
 var collegeScorecardExplorer = angular.module('collegeScorecardExplorer', []);
 
 /*
+ * Factory that produces an object with data on the visibility of the form
+ * and results pages.
+ */
+collegeScorecardExplorer.factory('toggleViewFactory', function() {
+  var service = {};
+  var visibility = {form : true, results : false} //default value
+
+  /*
+   * Function returning the visibility object to the controller.
+   * @return {visibility} Object with boolean properties for form and results
+   *     visibility.
+   */
+  service.getVisibility = function() {
+    return visibility;
+  }
+
+  /*
+   * Function that toggles the visibility of the form and results when called.
+   */
+  service.toggleView = function() {
+    visibility.form = !visibility.form;
+    visibility.results = !visibility.results;
+  }
+
+  return service;
+});
+
+/*
  * Controller containing data for which views are currently visisble.
  */
 collegeScorecardExplorer.controller('ViewController',
@@ -112,33 +140,6 @@ collegeScorecardExplorer.factory('commonScorecardDataFactory', function($http) {
   return service;
 });
 
-/*
- * Factory that produces an object with data on the visibility of the form
- * and results pages.
- */
-collegeScorecardExplorer.factory('toggleViewFactory', function() {
-  var service = {};
-  var visibility = {form : true, results : false} //default value
-
-  /*
-   * Function returning the visibility object to the controller.
-   * @return {visibility} Object with boolean properties for form and results
-   *     visibility.
-   */
-  service.getVisibility = function() {
-    return visibility;
-  }
-
-  /*
-   * Function that toggles the visibility of the form and results when called.
-   */
-  service.toggleView = function() {
-    visibility.form = !visibility.form;
-    visibility.results = !visibility.results;
-  }
-
-  return service;
-});
 
 /** Factory that maintains the criteria model for searches. */
 collegeScorecardExplorer.factory('criteriaListFactory', function() {
@@ -200,62 +201,6 @@ collegeScorecardExplorer.factory('criteriaListFactory', function() {
   }
 
   return service;
-});
-
-/** Controller that handles the criteria form view. */
-collegeScorecardExplorer.controller('CriteriaFormController',
-    function CriteriaFormController($scope, $http, toggleViewFactory,
-        searchResultFactory, criteriaListFactory, commonScorecardDataFactory) {
-
-  $scope.categories = commonScorecardDataFactory.getCategoryData();
-
-  $scope.criteriaList = criteriaListFactory.getCriteriaList().data;
-
-  /*
-   * Modifies the criteria model based on user selections on the view.
-   * @param {integer} rowIndex Index of row being modified.
-   * @param {string} categoryName Name of the category in the criteria.
-   */
-  $scope.setRowCategoryInfo = function(rowIndex, categoryName) {
-    var row = $scope.criteriaList[rowIndex];
-    var categoryIndex = $scope.categories.data.findIndex(
-        function(element, index, array) {
-          return element.name == categoryName;
-        });
-    row.selectedCategoryIndex = categoryIndex;
-    row.selectedCategoryType = $scope.categories.data[categoryIndex].type;
-      if (row.selectedCategoryType == 'TEXT') {
-        row.allowableComparisons = ['Equal to'];
-      }
-      else if (row.selectedCategoryType == 'INTEGER') {
-        row.allowableComparisons = ['Equal to', 'Greater than', 'Less than'];
-      }
-      else if (row.selectedCategoryType == 'REAL') {
-        row.allowableComparisons = ['Equal to', 'Greater than', 'Less than'];
-    }
-  }
-
-  /** Adds a new criteria to the end of the criteria list model. */
-  $scope.addRow = function() {
-    criteriaListFactory.addCriteria();
-  }
-
-  /*
-   * Removes a criteria (row) at the specified index.
-   * @param {rowIndex} Index of the row being removed.
-   */
-  $scope.removeRow = function(rowIndex) {
-    criteriaListFactory.removeCriteria(rowIndex);
-  }
-
-  /*
-   * Submits the form by toggling the view from the form to the results and
-   * calling the search on the list of criteria.
-   */
-  $scope.submitForm = function() {
-    toggleViewFactory.toggleView();
-    searchResultFactory.search($scope.criteriaList);
-  }
 });
 
 /** Factory that produces search result data. */
@@ -382,6 +327,62 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
   }
 
   return service;
+});
+
+/** Controller that handles the criteria form view. */
+collegeScorecardExplorer.controller('CriteriaFormController',
+    function CriteriaFormController($scope, $http, toggleViewFactory,
+        searchResultFactory, criteriaListFactory, commonScorecardDataFactory) {
+
+  $scope.categories = commonScorecardDataFactory.getCategoryData();
+
+  $scope.criteriaList = criteriaListFactory.getCriteriaList().data;
+
+  /*
+   * Modifies the criteria model based on user selections on the view.
+   * @param {integer} rowIndex Index of row being modified.
+   * @param {string} categoryName Name of the category in the criteria.
+   */
+  $scope.setRowCategoryInfo = function(rowIndex, categoryName) {
+    var row = $scope.criteriaList[rowIndex];
+    var categoryIndex = $scope.categories.data.findIndex(
+        function(element, index, array) {
+          return element.name == categoryName;
+        });
+    row.selectedCategoryIndex = categoryIndex;
+    row.selectedCategoryType = $scope.categories.data[categoryIndex].type;
+      if (row.selectedCategoryType == 'TEXT') {
+        row.allowableComparisons = ['Equal to'];
+      }
+      else if (row.selectedCategoryType == 'INTEGER') {
+        row.allowableComparisons = ['Equal to', 'Greater than', 'Less than'];
+      }
+      else if (row.selectedCategoryType == 'REAL') {
+        row.allowableComparisons = ['Equal to', 'Greater than', 'Less than'];
+    }
+  }
+
+  /** Adds a new criteria to the end of the criteria list model. */
+  $scope.addRow = function() {
+    criteriaListFactory.addCriteria();
+  }
+
+  /*
+   * Removes a criteria (row) at the specified index.
+   * @param {rowIndex} Index of the row being removed.
+   */
+  $scope.removeRow = function(rowIndex) {
+    criteriaListFactory.removeCriteria(rowIndex);
+  }
+
+  /*
+   * Submits the form by toggling the view from the form to the results and
+   * calling the search on the list of criteria.
+   */
+  $scope.submitForm = function() {
+    toggleViewFactory.toggleView();
+    searchResultFactory.search($scope.criteriaList);
+  }
 });
 
 /** Controller for displaying the search results model in the results view. */
