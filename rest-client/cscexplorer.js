@@ -204,7 +204,8 @@ collegeScorecardExplorer.factory('criteriaListFactory', function() {
 
 /** Controller that handles the criteria form view. */
 collegeScorecardExplorer.controller('CriteriaFormController',
-    function CriteriaFormController($scope, $http, toggleViewFactory, searchResultFactory, criteriaListFactory, commonScorecardDataFactory) {
+    function CriteriaFormController($scope, $http, toggleViewFactory,
+        searchResultFactory, criteriaListFactory, commonScorecardDataFactory) {
 
   $scope.categories = commonScorecardDataFactory.getCategoryData();
 
@@ -258,7 +259,8 @@ collegeScorecardExplorer.controller('CriteriaFormController',
 });
 
 /** Factory that produces search result data. */
-collegeScorecardExplorer.factory('searchResultFactory', function($http, $q, commonScorecardDataFactory) {
+collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
+    commonScorecardDataFactory) {
   var service = {};
   var results = {data: []};
   var hostAddress = 'http://localhost:5000'
@@ -275,10 +277,12 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q, comm
    */
   var generateDataTypeUrl = function(dataTypeName, dataTypeIndex) {
     if (categoryData.data[dataTypeIndex].scope == 'year') {
-      var url = hostAddress + '/cscvis/api/v2.0/data/data_types/' + dataTypeName + '/year/' + dataYear;
+      var url = hostAddress + '/cscvis/api/v2.0/data/data_types/' + 
+        dataTypeName + '/year/' + dataYear;
     }
     else {
-      var url = hostAddress + '/cscvis/api/v2.0/data/data_types/' + dataTypeName + '/global';
+      var url = hostAddress + '/cscvis/api/v2.0/data/data_types/' +
+        dataTypeName + '/global';
     }
     return url;
   };
@@ -346,7 +350,8 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q, comm
     var validResultMap = new Map();
     var promises = [];
     criteriaRows.forEach(function(rowItem, rowIndex, rowArray) {
-      var uri = generateDataTypeUrl(rowItem.selectedCategory, rowItem.selectedCategoryIndex);
+      var uri = generateDataTypeUrl(
+        rowItem.selectedCategory, rowItem.selectedCategoryIndex);
       promises.push(requestData(uri).then(function(apiData) {
         addResults(rowItem, validResultMap, apiData);
       }));
@@ -381,7 +386,8 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q, comm
 
 /** Controller for displaying the search results model in the results view. */
 collegeScorecardExplorer.controller('ResultViewController',
-    function ResultViewController($scope, searchResultFactory, toggleViewFactory, criteriaListFactory, commonScorecardDataFactory) {
+    function ResultViewController($scope, searchResultFactory,
+        toggleViewFactory, criteriaListFactory, commonScorecardDataFactory) {
 
   $scope.criteriaList = criteriaListFactory.getCriteriaList().data;
   $scope.locationData = commonScorecardDataFactory.getCollegeLocationData();
