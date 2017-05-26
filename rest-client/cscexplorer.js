@@ -295,6 +295,9 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
     var validResultMap = new Map();
     var promises = [];
     criteriaRows.forEach(function(rowItem, rowIndex, rowArray) {
+      if (rowItem.selectedCategory == undefined) {
+        return;
+      }
       var uri = generateDataTypeUrl(
         rowItem.selectedCategory, rowItem.selectedCategoryIndex);
       promises.push(requestData(uri).then(function(apiData) {
