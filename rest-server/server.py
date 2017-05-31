@@ -263,7 +263,6 @@ def get_data_type_global(data_type):
     for college_value in query_result:
         global_data.append({'college_id':college_value[1], 'value':college_value[0]})
     conn.close()
-    print(all_data)
     return jsonify({'global':global_data})
 
 def _get_year_names():
@@ -335,7 +334,6 @@ def _get_data_type_names():
         break;
 
     conn.close()
-    print(data_types)
     return tuple(data_types)
 
 if __name__ == '__main__':
