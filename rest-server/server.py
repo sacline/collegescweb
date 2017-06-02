@@ -15,15 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import json
 import os
 import sqlite3
 from flask import Flask, abort, jsonify
+from flask_cors import CORS, cross_origin
 
-DB_PATH = os.getcwd() + '/data/database/college-scorecard.sqlite'
+DB_PATH = ''
+with open('server_config.json') as f:
+    data = json.load(f)
+    DB_PATH = data['DB_PATH']
 
 COLLEGE_NAMES, COLLEGE_IDS, YEAR_NAMES, DATA_TYPE_NAMES = (), (), (), ()
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 def init_server():
     """Call functions to get and store database info for input validation."""
@@ -263,7 +270,6 @@ def get_data_type_global(data_type):
     for college_value in query_result:
         global_data.append({'college_id':college_value[1], 'value':college_value[0]})
     conn.close()
-    print(all_data)
     return jsonify({'global':global_data})
 
 def _get_year_names():
@@ -335,9 +341,8 @@ def _get_data_type_names():
         break;
 
     conn.close()
-    print(data_types)
     return tuple(data_types)
 
+init_server()
 if __name__ == '__main__':
-    init_server()
     app.run(debug=False)
