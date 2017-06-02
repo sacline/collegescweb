@@ -34,7 +34,7 @@ collegeScorecardExplorer.controller('ViewController',
  */
 collegeScorecardExplorer.factory('commonScorecardDataFactory', function($http) {
   var service = {};
-  var baseUrl = 'http://localhost:5000/cscvis/api/v2.0/data';
+  var baseUrl = 'https://sacline.pythonanywhere.com/cscvis/api/v2.0/data';
   var categoryData = {};
   var collegeLocationData = {};
 
@@ -261,7 +261,7 @@ collegeScorecardExplorer.controller('CriteriaFormController',
 collegeScorecardExplorer.factory('searchResultFactory', function($http, $q, commonScorecardDataFactory) {
   var service = {};
   var results = {data: []};
-  var hostAddress = 'http://localhost:5000'
+  var hostAddress = 'http://sacline.pythonanywhere.com'
   var dataYear = '2014';
 
   var categoryData = commonScorecardDataFactory.getCategoryData();

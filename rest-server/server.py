@@ -21,8 +21,9 @@ import sqlite3
 from flask import Flask, abort, jsonify
 from flask_cors import CORS, cross_origin
 
+CONFIG_FILE = '/home/sacline/collegescweb/rest-server/server_config.json'
 DB_PATH = ''
-with open('server_config.json') as f:
+with open(CONFIG_FILE) as f:
     data = json.load(f)
     DB_PATH = data['DB_PATH']
 
