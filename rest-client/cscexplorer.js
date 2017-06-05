@@ -352,6 +352,11 @@ collegeScorecardExplorer.controller('CriteriaFormController',
         function(element, index, array) {
           return element.name == categoryName;
         });
+
+    //ensure the text input is reset upon changing criteria
+    row.inputValue = null;
+    row.selectedCategoryType = null;
+
     row.selectedCategoryIndex = categoryIndex;
     row.selectedCategoryType = $scope.categories.data[categoryIndex].type;
       if (row.selectedCategoryType == 'TEXT') {
