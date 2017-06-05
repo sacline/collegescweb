@@ -207,8 +207,8 @@ collegeScorecardExplorer.factory('criteriaListFactory', function() {
 collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
     commonScorecardDataFactory) {
   var service = {};
-  var results = {data: []};
-  var hostAddress = 'http://sacline.pythonanywhere.com'
+  var results = {data: [], validResultsExist: true};
+  var hostAddress = 'http://sacline.pythonanywhere.com';
   var dataYear = '2014';
 
   var categoryData = commonScorecardDataFactory.getCategoryData();
@@ -292,6 +292,7 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
    */
   service.search = function(criteriaRows) {
     results.data = [];
+    results.validResultsExist = true;
     var validResultMap = new Map();
     var promises = [];
     criteriaRows.forEach(function(rowItem, rowIndex, rowArray) {
@@ -317,6 +318,10 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
           results.data.push(resultsObj);
         }
       });
+      //let view know there are no results only after attempting to add results
+      if (results.data.length == 0) {
+        results.validResultsExist = false;
+      }
     });
   }
 

@@ -55,25 +55,32 @@
         </div>
       </form>
       <div ng-show="visibility.results" ng-controller="ResultViewController">
-        <div class="row">
-          <div class="col-md-2 col-md-offset-5">
-          <h1>Results</h1>
+        <div ng-hide="results.validResultsExist">
+          <div class="col-md-9 col-md-offset-3">
+            <h2>No valid results found, please try again.</h2>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-6 col-md-offset-1">
-            <b>Name - City, State</b>
+        <div ng-show="results.validResultsExist">
+          <div class="row">
+            <div class="col-md-7 col-md-offset-5">
+              <h1>Results</h1>
+            </div>
           </div>
-          <div ng-repeat="criteria in criteriaList" class="col-md-1">
-            <b>{{criteria.selectedCategory}}</b>
+          <div class="row">
+            <div class="col-md-6 col-md-offset-1">
+              <b>Name - City, State</b>
+            </div>
+            <div ng-repeat="criteria in criteriaList" class="col-md-1">
+              <b>{{criteria.selectedCategory}}</b>
+            </div>
           </div>
-        </div>
-        <div class="row" ng-repeat="result in results.data">
-          <div class="col-md-6 col-md-offset-1">
-            {{locationData[result.id].name}} - {{locationData[result.id].city}}, {{locationData[result.id].state}}
-          </div>
-          <div ng-repeat="criteria in criteriaList" class="col-md-1">
-            {{result[criteria.selectedCategory]}}
+          <div class="row" ng-repeat="result in results.data">
+            <div class="col-md-6 col-md-offset-1">
+              {{locationData[result.id].name}} - {{locationData[result.id].city}}, {{locationData[result.id].state}}
+            </div>
+            <div ng-repeat="criteria in criteriaList" class="col-md-1">
+              {{result[criteria.selectedCategory]}}
+            </div>
           </div>
         </div>
         <div class="row">
