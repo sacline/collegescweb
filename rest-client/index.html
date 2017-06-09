@@ -47,7 +47,7 @@
           <div class="col-md-4">
             <div ng-switch on="criteria.selectedCategoryType">
               <input class="form-control" placeholder="Enter a whole number greater than 0" type="number" min="0" max="999999999" ng-model="criteria.inputValue" ng-switch-when="INTEGER">
-              <input class="form-control" placeholder="Enter a decimal number between 0 and 1" type="number" min="0" max="1" step="0.001" ng-model="criteria.inputValue" ng-switch-when="REAL">
+              <input class="form-control" placeholder="Enter a decimal number greater than 0" type="number" min="0" step="0.001" ng-model="criteria.inputValue" ng-switch-when="REAL">
               <input class="form-control" placeholder="Enter a text value" type="text" ng-model="criteria.inputValue" ng-switch-when="TEXT">
             </div>
           </div>
