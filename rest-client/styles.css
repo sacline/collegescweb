@@ -1,5 +1,29 @@
 body {
-  background-color:#AAAAAA;
+  background-color:#CCCCCC;
+}
+
+.navbar {
+  background-color:#CCCCCC;
+  border-color:#000000;
+  height:40px;
+  min-height:40px !important;
+}
+
+.navbar-brand {
+  height:40px;
+  padding-bottom:0px !important;
+  padding-top:10px !important;
+}
+
+.navbar-nav > li > a {
+  height:40px;
+  padding-bottom:10px !important;
+  padding-top:10px !important;
+}
+
+.navbar-right {
+  padding-right:12px !important;
+  padding-top:2px !important;
 }
 
 .jumbotron {
