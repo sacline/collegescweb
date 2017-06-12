@@ -25,7 +25,7 @@ var collegeScorecardExplorer = angular.module('collegeScorecardExplorer', []);
  */
 collegeScorecardExplorer.factory('toggleViewFactory', function() {
   var service = {};
-  var visibility = {form : true, results : false} //default value
+  var visibility = {form : true, results : false, validResults: false} //default
 
   /*
    * Function returning the visibility object to the controller.
@@ -38,10 +38,19 @@ collegeScorecardExplorer.factory('toggleViewFactory', function() {
 
   /*
    * Function that toggles the visibility of the form and results when called.
+   * @param {string} view The view to be modified.
+   * @param {boolean} show True if the view should be visible, false if
+   *     it should not be visible.
    */
-  service.toggleView = function() {
-    visibility.form = !visibility.form;
-    visibility.results = !visibility.results;
+  service.toggleView = function(view, show) {
+    visibility[view] = show;
+  }
+
+  /**Function that hides all views.*/
+  service.hideAllViews = function() {
+    Object.keys(visibility).forEach(function(key, index, arr) {
+      visibility[key] = false;
+    });
   }
 
   return service;
@@ -205,9 +214,9 @@ collegeScorecardExplorer.factory('criteriaListFactory', function() {
 
 /** Factory that produces search result data. */
 collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
-    commonScorecardDataFactory) {
+    commonScorecardDataFactory, toggleViewFactory) {
   var service = {};
-  var results = {data: [], validResultsExist: true};
+  var results = {data: []};
   var hostAddress = 'http://sacline.pythonanywhere.com';
   var dataYear = '2014';
 
@@ -292,7 +301,6 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
    */
   service.search = function(criteriaRows) {
     results.data = [];
-    results.validResultsExist = true;
     var validResultMap = new Map();
     var promises = [];
     criteriaRows.forEach(function(rowItem, rowIndex, rowArray) {
@@ -320,8 +328,12 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
       });
       //let view know there are no results only after attempting to add results
       if (results.data.length == 0) {
-        results.validResultsExist = false;
+        toggleViewFactory.toggleView('validResults', false);
       }
+      else {
+        toggleViewFactory.toggleView('validResults', true);
+      }
+      toggleViewFactory.toggleView('results', true);
     });
   }
 
@@ -393,7 +405,7 @@ collegeScorecardExplorer.controller('CriteriaFormController',
    * calling the search on the list of criteria.
    */
   $scope.submitForm = function() {
-    toggleViewFactory.toggleView();
+    toggleViewFactory.toggleView('form', false);
     searchResultFactory.search($scope.criteriaList);
   }
 });
@@ -410,6 +422,7 @@ collegeScorecardExplorer.controller('ResultViewController',
 
   /** Toggles the view from the results back to the search form. */
   $scope.returnToSearch = function() {
-    toggleViewFactory.toggleView();
+    toggleViewFactory.hideAllViews();
+    toggleViewFactory.toggleView('form', true);
   }
 });
