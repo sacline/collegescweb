@@ -36,11 +36,13 @@
         <div ng-repeat="criteria in criteriaList" class="row toprow">
           <div class="col-md-2 col-md-offset-2">
             <select ng-model="criteria.selectedCategory" ng-change="setRowCategoryInfo(criteria.index, criteria.selectedCategory)" class="form-control">
+              <option value="" selected disabled>Select a category</option>
               <option ng-repeat="category in categories.data" value="{{category.name}}">{{category.name}}</option>
             </select>
           </div>
           <div class="col-md-2">
             <select ng-model="criteria.selectedComparison" class="form-control">
+              <option value="" selected disabled>Select a comparison</option>
               <option ng-repeat="comparison in criteria.allowableComparisons">{{comparison}}</option>
             </select>
           </div>
