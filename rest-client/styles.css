@@ -1,33 +1,33 @@
 body {
-  background-color:#CCCCCC;
+  background-color: #cccccc;
 }
 
 .navbar {
-  background-color:#CCCCCC;
-  border-color:#000000;
-  height:40px;
-  min-height:40px !important;
+  background-color: #cccccc;
+  border-color: #000000;
+  height: 40px;
+  min-height: 40px;
 }
 
 .navbar-brand {
-  height:40px;
-  padding-bottom:0px !important;
-  padding-top:10px !important;
+  height: 40px;
+  padding-bottom: 0px;
+  padding-top: 10px;
 }
 
 .navbar-nav > li > a {
   height: 40px;
-  padding-bottom: 10px !important;
-  padding-top: 10px !important;
+  padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .navbar-right {
-  padding-right: 12px !important;
-  padding-top: 2px !important;
+  padding-right: 12px;
+  padding-top: 2px;
 }
 
 .jumbotron {
-  background-color: #000000 !important;
+  background-color: #000000;
   color: #ffffff;
   padding-top: 30px;
 }
