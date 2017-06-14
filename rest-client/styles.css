@@ -36,11 +36,40 @@ body {
   margin-top: 30px;
 }
 
+.removerowbutton, .removerowbutton:focus {
+  background-color: #ff6060;
+}
+
+.removerowbutton:hover, .removerowbutton:active, .removerowbutton:active:focus {
+  background-color: #ff4040;
+}
+
 .criteriarowbuttons {
   margin-top: 100px;
 }
 
+.addcriteriabutton, .addcriteriabutton:focus {
+  background-color: #7aadff;
+}
+
+.addcriteriabutton:hover, .addcriteriabutton:active, .addcriteriabutton:active:focus {
+  background-color: #66a0ff;
+}
+
+.searchbutton, .searchbutton:focus {
+  background-color: #90ff90;
+}
+
+.searchbutton:hover, .searchbutton:active, .searchbutton:active:focus {
+  background-color: #70ff70;
+}
+
 .backtosearchbutton {
+  background-color: #bc9bff;
   margin-bottom: 30px;
   margin-top: 10px;
+}
+
+.backtosearchbutton:hover, .backtosearchbutton:active, .backtosearchbutton:active:focus {
+  background-color: #ad84ff;
 }
