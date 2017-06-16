@@ -89,7 +89,7 @@
               <option ng-repeat="comparison in criteria.allowableComparisons">{{comparison}}</option>
             </select>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div ng-switch on="criteria.selectedCategoryType">
               <input class="form-control" placeholder="Enter a whole number greater than 0" type="number" min="0" max="999999999" ng-model="criteria.inputValue" ng-switch-when="INTEGER">
               <input class="form-control" placeholder="Enter a decimal number greater than 0" type="number" min="0" step="0.001" ng-model="criteria.inputValue" ng-switch-when="REAL">
@@ -109,14 +109,14 @@
             </button>
           </div>
           <div class="col-md-2">
-            <input type="submit" class="btn btn-default searchbutton" value="Search"/>
+            <input type="submit" class="btn btn-default center-block searchbutton" value="Search"/>
           </div>
         </div>
       </form>
       <div ng-show="visibility.results" ng-controller="ResultViewController">
         <div ng-hide="visibility.validResults">
-          <div class="col-md-8 col-md-offset-4">
-            <h2>No valid results found, please try again.</h2>
+          <div class="col-md-4 col-md-offset-4">
+            <h2>No valid results found.</h2>
           </div>
         </div>
         <div ng-show="visibility.validResults">
@@ -126,25 +126,27 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 col-md-offset-1">
-              <b>Name - City, State</b>
-            </div>
-            <div ng-repeat="criteria in criteriaList" class="col-md-1">
-              <b>{{criteria.selectedCategory}}</b>
-            </div>
-          </div>
-          <div class="row" ng-repeat="result in results.data">
-            <div class="col-md-6 col-md-offset-1">
-              {{locationData[result.id].name}} - {{locationData[result.id].city}}, {{locationData[result.id].state}}
-            </div>
-            <div ng-repeat="criteria in criteriaList" class="col-md-1">
-              {{result[criteria.selectedCategory]}}
+            <div class="col-md-8 col-md-offset-2">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Name - City, State</th>
+                    <th ng-repeat="criteria in criteriaList">{{criteria.selectedCategory}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="result in results.data">
+                    <td>{{locationData[result.id].name}} - {{locationData[result.id].city}}, {{locationData[result.id].state}}</td>
+                    <td ng-repeat="criteria in criteriaList">{{result[criteria.selectedCategory]}}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
         <div class="row">
-            <div class = "col-md2 col-md-offset-5">
-              <button type="button" class="btn btn-default backtosearchbutton" ng-click="returnToSearch()">
+            <div class="col-md-4 col-md-offset-4">
+              <button type="button" class="btn btn-default center-block backtosearchbutton" ng-click="returnToSearch()">
                 Back to Search
               </button>
             </div>

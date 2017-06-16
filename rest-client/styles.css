@@ -56,7 +56,7 @@ body {
 }
 
 .criteriarowbuttons {
-  margin-top: 100px;
+  margin-top: 30px;
 }
 
 .addcriteriabutton, .addcriteriabutton:focus {
@@ -83,4 +83,21 @@ body {
 
 .backtosearchbutton:hover, .backtosearchbutton:active, .backtosearchbutton:active:focus {
   background-color: #ad84ff;
+}
+
+.table {
+  background-color: #e2e2e2;
+  color: #000000;
+}
+
+.table, .table-bordered > thead > tr > th, .table-bordered > tbody > tr > td {
+  border-color: #808080;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
 }
