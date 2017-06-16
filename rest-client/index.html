@@ -33,6 +33,13 @@
           <h2>How to use CSCExplorer</h2>
         </div>
         <div class="modal-body">
+          <b>General information:</b>
+          <ul>
+            <li>Using CSCExplorer requires some knowledge of the <a href="https://collegescorecard.ed.gov/data/documentation">College Scorecard Data Dictionary</a>.</li>
+            <li>Searches are made by selecting categories that exist in the Data Dictionary as "Variable Names".</li>
+            <li>Categories that represent a percentage require a decimal number in the search input. For example, 32% should be input as 0.32.</li>
+          </ul>
+          <b>How to form and execute a search:</b>
           <ol>
             <li>Click the "Add Criteria" button to generate a new blank search criteria.</li>
             <li>Use the leftmost dropdown box to select a category to search by.</li>
@@ -40,6 +47,14 @@
             <li>Input a value to filter the category with in the rightmost box.</li>
             <li>Repeat steps 1-4 for each additional criteria.</li>
             <li>Click the "Search" button to display a table of all colleges meeting the criteria!</li>
+          </ol>
+          <b>Example walkthrough:</b>
+          <ol>
+            <li>Click "Add Criteria" to add a new blank search criteria.</li>
+            <li>Click in the leftmost dropdown box and select the first entry, "ADM_RATE". This category represents the percentage of applicants admitted to the college.</li>
+            <li>Click the next dropdown box and select "Less than". We will be searching for colleges with an admission rate less than the percentage we specify in the final box.</li>
+            <li>Enter "0.1" without the quotation marks in the final box. This search will return all the colleges with an admission rate less than 0.1, or 10%.</li>
+            <li>Click the green "Search" button and the results will be displayed!</li>
           </ol>
         </div>
         <div class="modal-footer">
