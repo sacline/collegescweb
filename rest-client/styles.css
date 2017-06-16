@@ -29,6 +29,14 @@ body {
   padding-top: 2px;
 }
 
+.modal-title > h2 {
+  margin-left: 40px;
+}
+
+.modal-footer {
+  text-align: center;
+}
+
 .jumbotron {
   background-color: #000000;
   color: #ffffff;

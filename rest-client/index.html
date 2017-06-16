@@ -16,7 +16,8 @@
         <a class="navbar-brand" href="http://sacline.pythonanywhere.com/static/index.html">CSCExplorer</a>
         <ul class="nav navbar-nav navbar-left">
           <li><a href="http://sacline.pythonanywhere.com/static/index.html">Search</a></li>
-          <li><a href="#">Help</a></li>
+          <li><a data-toggle="modal" data-target="#helpmodal" href="javascript:void(0)">Help</a></li>
+          <li><a href="#">About</a></li>
         </ul>
         <div class="navbar-nav navbar-right">
           <a href="https://github.com/sacline/collegescweb">
@@ -25,6 +26,29 @@
         </div>
       </div>
     </nav>
+    <!--Modals-->
+    <div class="modal helpmodal fade" id="helpmodal" role="dialog">
+        <div class="modal-content">
+          <div class="modal-title">
+            <h2>How to use CSCExplorer</h2>
+          </div>
+          <div class="modal-body">
+            <ol>
+              <li>Click the "Add Criteria" button to generate a new blank search criteria.</li>
+              <li>Use the leftmost dropdown box to select a category to search by.</li>
+              <li>Use the next dropdown box to select a comparison basis.</li>
+              <li>Input a value to filter the category with in the rightmost box.</li>
+              <li>Repeat steps 1-4 for each additional criteria.</li>
+              <li>Click the "Search" button to display a table of all colleges meeting the criteria!</li>
+            </ol>
+          </div>
+          <div class="modal-footer">
+            <button type="button" data-dismiss="modal">
+              OK
+            </button>
+          </div>
+        </div>
+    </div>
     <div class="jumbotron">
       <div class="container text-center">
         <h1>College Scorecard Explorer</h1>
