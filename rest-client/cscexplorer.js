@@ -71,7 +71,7 @@ collegeScorecardExplorer.controller('ViewController',
  */
 collegeScorecardExplorer.factory('commonScorecardDataFactory', function($http) {
   var service = {};
-  var baseUrl = 'https://sacline.pythonanywhere.com/cscvis/api/v2.0/data';
+  var baseUrl = 'https://www.clinesa.com/cscvis/api/v2.0/data';
   var categoryData = {};
   var collegeLocationData = {};
 
@@ -217,7 +217,7 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
     commonScorecardDataFactory, toggleViewFactory) {
   var service = {};
   var results = {data: []};
-  var hostAddress = 'http://sacline.pythonanywhere.com';
+  var hostAddress = 'http://www.clinesa.com';
   var dataYear = '2014';
 
   var categoryData = commonScorecardDataFactory.getCategoryData();
