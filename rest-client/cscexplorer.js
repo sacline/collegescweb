@@ -71,7 +71,7 @@ collegeScorecardExplorer.controller('ViewController',
  */
 collegeScorecardExplorer.factory('commonScorecardDataFactory', function($http) {
   var service = {};
-  var baseUrl = 'https://www.clinesa.com/cscvis/api/v2.0/data';
+  var baseUrl = 'http://www.clinesa.com/cscvis/api/v2.0/data';
   var categoryData = {};
   var collegeLocationData = {};
 
