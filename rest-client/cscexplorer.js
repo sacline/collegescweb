@@ -155,19 +155,19 @@ collegeScorecardExplorer.factory('criteriaListFactory', function() {
   var service = {};
   var criteriaList = [];
 
-  /** Criteria class containing data used throughout the app. */
-  class Criteria {
-    /** @param {integer} index Index of the criteria in the list. */
-    constructor(index) {
-      this.index = index;
-      this.selectedCategory = null;
-      this.selectedCategoryType = null; //default value
-      this.selectedCategoryIndex = null;
-      this.allowableComparisons = null;
-      this.selectedComparison = null;
-      this.inputValue = null;
-    }
-  }
+  /**
+   *  Criteria object containing data used throughout the app.
+   *  @param {integer} index Index of the criteria in the list.
+   */
+  var Criteria = function(index) {
+    this.index = index;
+    this.selectedCategory = null;
+    this.selectedCategoryType = null; //default value
+    this.selectedCategoryIndex = null;
+    this.allowableComparisons = null;
+    this.selectedComparison = null;
+    this.inputValue = null;
+  };
 
   /*
    * Function called by the controller to add a new criteria object to the list.
@@ -273,21 +273,38 @@ collegeScorecardExplorer.factory('searchResultFactory', function($http, $q,
       if (resultsMap.get(id) == undefined) {
         resultsMap.set(id, []);
       }
+
+      //custom defineProperty function
+      function _defineProperty(obj, key, value) {
+        if (key in obj) {
+          Object.defineProperty(obj, key, {
+            value : value,
+            enumerable : true,
+            configurable: true,
+            writable: true
+          });
+        }
+        else {
+          obj[key] = value;
+        }
+        return obj;
+      }
+
       var category = row.selectedCategory;
       switch (row.selectedComparison) {
         case 'Greater than':
           if (dataObject.value > row.inputValue) {
-            resultsMap.get(id).push({[category] : dataObject.value});
+            resultsMap.get(id).push(_defineProperty({}, category, dataObject.value));
           }
           break;
         case 'Less than':
           if (dataObject.value < row.inputValue) {
-            resultsMap.get(id).push({[category] : dataObject.value});
+            resultsMap.get(id).push(_defineProperty({}, category, dataObject.value));
           }
           break;
         case 'Equal to':
           if (dataObject.value ==  row.inputValue) {
-            resultsMap.get(id).push({[category] : dataObject.value});
+            resultsMap.get(id).push(_defineProperty({}, category, dataObject.value));
           }
           break;
       }
@@ -365,10 +382,12 @@ collegeScorecardExplorer.controller('CriteriaFormController',
    */
   $scope.setRowCategoryInfo = function(rowIndex, categoryName) {
     var row = $scope.criteriaList[rowIndex];
-    var categoryIndex = $scope.categories.data.findIndex(
-        function(element, index, array) {
-          return element.name == categoryName;
-        });
+    var categoryIndex = -1;
+    for (var i = 0; i < $scope.categories.data.length; i++) {
+      if ($scope.categories.data[i].name == categoryName) {
+        categoryIndex = i;
+      }
+    }
 
     //ensure the text input is reset upon changing criteria
     row.inputValue = null;
