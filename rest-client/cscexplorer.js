@@ -427,6 +427,26 @@ collegeScorecardExplorer.controller('CriteriaFormController',
     toggleViewFactory.toggleView('form', false);
     searchResultFactory.search($scope.criteriaList);
   }
+
+  /*
+   * Creates an initial criteria to be present when the site loads.
+   * This is to be used when showing a demo of the site.
+  */
+  var setInitialSearchCriteria = function() {
+    if ($scope.categories.data == undefined) {
+        window.setTimeout(setInitialSearchCriteria, 50);
+    }
+    else {
+      $scope.addRow();
+      $scope.criteriaList[0].selectedCategory = "ADM_RATE";
+      $scope.setRowCategoryInfo(0, "ADM_RATE");
+      $scope.criteriaList[0].selectedComparison = "Less than";
+      $scope.criteriaList[0].inputValue = 0.1;
+    }
+  }
+
+  setInitialSearchCriteria();
+
 });
 
 /** Controller for displaying the search results model in the results view. */
