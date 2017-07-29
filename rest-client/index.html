@@ -15,6 +15,7 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="http://clinesa.com/collegescorecard">CSCExplorer</a>
         <ul class="nav navbar-nav navbar-left">
+          <li><a data-toggle="modal" data-target="#intromodal" href="javascript:void(0)">Intro</a></li>
           <li><a data-toggle="modal" data-target="#helpmodal" href="javascript:void(0)">Help</a></li>
           <li><a data-toggle="modal" data-target="#infomodal" href="javascript:void(0)">About</a></li>
         </ul>
@@ -26,6 +27,44 @@
       </div>
     </nav>
     <!--Modals-->
+    <div class="modal intromodal" id="intromodal" role="dialog">
+      <div class ="modal-content">
+        <div class="modal-title">
+          <h2>Welcome to CSCExplorer</h2>
+        </div>
+        <div class="modal-body">
+          <h3>About</h3>
+          <ul>
+            <li>CSCExplorer is a web app for searching the Department of Education's College Scorecard data.</li>
+            <li>Searches return a list of colleges that meet all the search "criteria" or filters.</li>
+            <li>When the search is executed, a list of colleges and the values of the criteria are displayed in a table.</li>
+          </ul>
+          <h3>Forming search criteria</h3>
+          <ol>
+            <li>To form a search, click the blue "Add Search Criteria" button to add a new blank criteria.</li>
+            <li>Use the first dropdown to select a "category" to filter by.</li>
+            <li>Use the second dropdown to select a comparison.</li> 
+            <li>Enter a value in the third box to compare by.</li>
+            <li>Repeat steps 1-4 for multiple criteria if desired.</li>
+            <li>Click the green "Search" button to generate a table of colleges with their filtered criteria values.</li>
+          </ol>
+          <h3>Try it!</h3>
+          <ul>
+            <li>A default search has been added to the page.</li>
+            <li>This search will return the colleges with an admission rate of less than 10%.</li>
+            <li>Click the green "Search" button to see the results!</li>
+            <ul>
+              <li>Note that this returns data exactly as it is found in the Dept. of Education data,<br>so some colleges will be shown that report an admission rate of 0%!</li>
+            </ul>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" data-dismiss="modal">
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="modal helpmodal fade" id="helpmodal" role="dialog">
       <div class="modal-content">
         <div class="modal-title">
@@ -81,6 +120,8 @@
           </button>
         </div>
       </div>
+    </div>
+    <div class="modal intromodal in">
     </div>
     <div class="jumbotron">
       <div class="container text-center">

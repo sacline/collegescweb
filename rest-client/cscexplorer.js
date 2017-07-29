@@ -61,7 +61,17 @@ collegeScorecardExplorer.factory('toggleViewFactory', function() {
  */
 collegeScorecardExplorer.controller('ViewController',
     function ViewController($scope, toggleViewFactory) {
+
   $scope.visibility = toggleViewFactory.getVisibility();
+
+  //jQuery call to display intro modal upon loading the page.
+  $scope.showIntroOnLoad = function(){
+    $(window).on('load', function(){
+      $('#intromodal').modal('show');
+    });
+  }
+
+  $scope.showIntroOnLoad();
 });
 
 /*
